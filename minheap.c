@@ -10,22 +10,6 @@
 #define NOTHING -1
 
 /*************************************************************************
- ** Suggested helper functions -- part of starter code
- *************************************************************************/
-
-/* Swaps contents of heap->arr[index1] and heap->arr[index2] if both 'index1'
- * and 'index2' are valid indices f/*
- * Our min-heap implementation.
- *
- * Author (starter code): A. Tafliovich.
- */
-
-#include "minheap.h"
-
-#define ROOT_INDEX 1
-#define NOTHING -1
-
-/*************************************************************************
  ** Suggested helper functions -- to help designing your code
  *************************************************************************/
  
