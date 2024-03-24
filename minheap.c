@@ -234,8 +234,8 @@ MinHeap* newHeap(int capacity) {
 	MinHeap *new = malloc(sizeof(MinHeap));
 	new->size = 0;
 	new->capacity = capacity;
-	new->arr = malloc(sizeof(HeapNode) * (capacity + 1));	// allocate for capacity and empty index 0
-	new->indexMap = malloc(sizeof(int) * capacity);
+	new->arr = (HeapNode *)calloc(sizeof(HeapNode) * (capacity + 1));	// allocate for capacity and empty index 0
+	new->indexMap = (int *)calloc(sizeof(int) * capacity);
 	
 	return new;
 }
