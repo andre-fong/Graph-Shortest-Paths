@@ -105,16 +105,44 @@ void addTreeEdge(Records* records, int ind, int fromVertex, int toVertex,
  * in the distance tree 'distTree'.
  */
 EdgeList* makePath(Edge* distTree, int vertex, int startVertex) {
-	// TODO
-	return NULL;
+	// Assuming correctness of Dijkstra's, distTree should be s.t.:
+	// distTree[u.id] = an edge (u, v)
+	
+	// Base case: vertex == startVertex
+	if (vertex == startVertex) return NULL;
+	
+	// Recursive case:
+	int nextVertex = distTree[vertex].toVertex;
+	EdgeList *next = makePath(distTree, nextVertex, startVertex);
+	
+	// Current weight is distance of current vertex in distTree - distance of next vertex in distTree
+	int weight = distTree[vertex].weight - distTree[nextVertex].weight;
+	Edge *edge = newEdge(vertex, nextVertex, weight);
+	
+	return newEdgeList(edge, next);
 }
 
 /* Frees all memory previously allocated for records. */
 void deleteRecords(Records *records) {
-	// TODO
-	return;
+	deleteHeap(records->heap);
+	free(records->finished);
+	free(records->predecessors);
+	free(records->tree);
+	free(records);
 }
 
+/* Allocates space for a new Edge array from records.
+ * Prereqs: * should be called before deleteRecords(records).
+ *          * records should follow a complete run of Prim's or Dijkstra's
+ */
+Edge *extractTreeFromRecords(Records *records) {
+	Edge *tree = malloc(records->numTreeEdges * sizeof(Edge));
+	for (int i = 0; i < records->numTreeEdges; i++) {
+		tree[i] = records->tree[i];
+	}
+	return tree;
+}
+	
 /* Get other vertex from edge in v.id's adjacency list */
 int getIdFromEdge(Edge *edge, int id) {
 	return (edge->fromVertex == id) ? edge->toVertex : edge->fromVertex;
@@ -164,8 +192,9 @@ Edge* getMSTprim(Graph* graph, int startVertex) {
 		}
 	}
 	
-	// TODO: Free mem
-	return records->tree;
+	Edge *tree = extractTreeFromRecords(records);
+	deleteRecords(records);
+	return tree;
 }
 
 /* Runs Dijkstra's algorithm on Graph 'graph' starting from vertex with ID
@@ -205,8 +234,9 @@ Edge* getDistanceTreeDijkstra(Graph* graph, int startVertex) {
 		}
 	}
 	
-	// TODO: Free mem
-	return records->tree;
+	Edge *tree = extractTreeFromRecords(records);
+	deleteRecords(records);
+	return tree;
 }
 
 /* Creates and returns an array 'paths' of shortest paths from every vertex
@@ -219,8 +249,22 @@ Edge* getDistanceTreeDijkstra(Graph* graph, int startVertex) {
  * Returns NULL if 'startVertex' is not valid in 'distTree'.
  */
 EdgeList** getShortestPaths(Edge* distTree, int numVertices, int startVertex) {
+	// Check startVertex is valid in graph
+	if (startVertex >= numVertices || startVertex < 0) return NULL;
 	
-	return NULL;
+	EdgeList **paths = malloc(numVertices * sizeof(EdgeList *));
+	
+	// Check malloc was successful
+	if (paths == NULL) {
+		fprintf(stderr, "Could not allocate memory for paths list\n");
+		exit(1);
+	}
+	
+	for (int i = 0; i < numVertices; i++) {
+		paths[i] = makePath(distTree, i, startVertex);
+	}
+	
+	return paths;
 }
 
 /*************************************************************************
